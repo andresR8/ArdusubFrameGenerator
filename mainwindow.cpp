@@ -66,8 +66,12 @@ void MainWindow::generateFrame(){
       else
         editFile(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber) , "#define "+ frameNameUpper + "_FRAME "+ QString("%1").arg(definesNumber+1) + "\n//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber+1)  ,false);*/
 
-        //Modify Ardusub/deploy.sh
+       //Modify Ardusub/deploy.sh
        // createDeploy(frameNameLower);
+
+      //Modify libraries/AP_Motors/AP_Motors.h
+        editFile(AP_MOTORS,"#include \"AP_MotorsSimpleROV.h\"" ,"#include \"AP_Motors" + frameName +"ROV.h",true);
+
     }
     else
         qDebug()<<"Frame Name null";
@@ -118,7 +122,6 @@ void MainWindow::createDeploy(QString frameNameLower){
 void MainWindow::editFile(QString filePath, QString tag, QString add, bool mantain){
     QFile file(filePath);
     file.open(QIODevice::ReadOnly);
-
     QRegularExpression re(tag);
     QString dataText = file.readAll();
     file.close();
