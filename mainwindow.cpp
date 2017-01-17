@@ -72,22 +72,22 @@ void MainWindow::generateFrame(){
       //Modify libraries/AP_Motors/AP_Motors.h
         editFile(AP_MOTORS,"#include \"AP_MotorsSimpleROV.h\"" ,"#include \"AP_Motors" + frameName +"ROV.h",true);
 
+       //Modify mk/targets.mk
+        QString newTargets=getLineContains(MK_TARGETS,"FRAMES = quad tri hexa y6 octa octa-quad heli single coax");
+        editFile(MK_TARGETS,newTargets,newTargets + " " +frameNameLower,false);
+
+
     }
     else
         qDebug()<<"Frame Name null";
 }
 
 int MainWindow::checkDefines(){
-    QFile file(ARDUSUB_DEFINES);
-    file.open(QIODevice::ReadOnly);
-    QTextStream in(&file);
 
-    while (!in.atEnd()){
-        QString line=in.readLine();
-         if(line.contains("//ArdusubFrameGenerator#"))
-                 return line.mid(line.indexOf("#")+1,line.size()-1).toInt();
-    }
-    file.close();
+    QString line=getLineContains(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#");
+
+    if(line!=NULL)
+            return line.mid(line.indexOf("#")+1,line.size()-1).toInt();
 
     return 14;
 
@@ -119,7 +119,27 @@ void MainWindow::createDeploy(QString frameNameLower){
 
 }
 
-void MainWindow::editFile(QString filePath, QString tag, QString add, bool mantain){
+QString MainWindow::getLineContains(QString filePath, QString contains){
+    QFile file(filePath);
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    QString dataOut=NULL;
+
+    while (!in.atEnd()){
+        QString line=in.readLine();
+         if(line.contains(contains)){
+           dataOut=line;
+           break;
+         }
+
+
+    }
+    file.close();
+
+    return dataOut;
+}
+
+void MainWindow::editFile(QString filePath, QString tag, QString add, bool overwrite){
     QFile file(filePath);
     file.open(QIODevice::ReadOnly);
     QRegularExpression re(tag);
@@ -128,7 +148,7 @@ void MainWindow::editFile(QString filePath, QString tag, QString add, bool manta
 
 
     QString replacementText(tag + "\n" + add);
-    if(!mantain)
+    if(!overwrite)
     replacementText=add;
 
 

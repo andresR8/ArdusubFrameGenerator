@@ -48,9 +48,10 @@ private:
     QPushButton *btn_generate;
     QTextEdit *txt_frame_name;
     //Private functions
-    void editFile(QString filePath, QString tag, QString add, bool mantain);
+    void editFile(QString filePath, QString tag, QString add, bool overwrite);
     int checkDefines();
     void createDeploy(QString frameNameLower);
+    QString getLineContains(QString file, QString contains);
 };
 
 #endif // MAINWINDOW_H
