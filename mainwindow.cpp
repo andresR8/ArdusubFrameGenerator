@@ -45,15 +45,13 @@ void MainWindow::createMotorsList(int value){
 
 void MainWindow::generateFrame(){
 
-    QString frameName=txt_frame_name->toPlainText().toLower();
+    QString frameName=txt_frame_name->toPlainText().trimmed().toLower();
     frameName.replace( " ", "" ); //Formatting
     frameName[0] = frameName[0].toUpper();
     QString frameNameUpper=frameName.toUpper();
     QString frameNameLower=frameName.toLower();
 
-    qDebug()<<QString("%1").arg(frameName.compare(""));
-
-    if(frameName!=NULL &&  frameName.compare("")!=1){
+    if(frameName!=NULL &&  frameName[0].unicode()!=0){
       qDebug()<<"FrameName " + frameName;
       //Modify Ardusub/sub.h file
         //editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameNameUpper + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName,true);
@@ -69,11 +67,7 @@ void MainWindow::generateFrame(){
         editFile(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber) , "#define "+ frameNameUpper + "_FRAME "+ QString("%1").arg(definesNumber+1) + "\n//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber+1)  ,false);*/
 
         //Modify Ardusub/deploy.sh
-        createDeploy(frameNameLower);
-
-
-
-
+       // createDeploy(frameNameLower);
     }
     else
         qDebug()<<"Frame Name null";
