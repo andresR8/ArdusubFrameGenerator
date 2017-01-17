@@ -16,7 +16,7 @@
 #define ARDUSUB_SUB     "ArduSub/Sub.h"
 #define ARDUSUB_CONFIG  "ArduSub/config.h"
 #define ARDUSUB_DEFINES "ArduSub/defines.h"
-#define ARDUSUB_DEPLOYS "Ardusub/deploy.sh"
+#define ARDUSUB_DEPLOY  "ArduSub/deploy.sh"
 #define AP_MOTORS       "libraries/AP_Motors/AP_Motors.h"
 #define MK_TARGETS      "mk/targets.mk"
 #define LIBRARIES       "libraries/"
@@ -50,6 +50,7 @@ private:
     //Private functions
     void editFile(QString filePath, QString tag, QString add, bool mantain);
     int checkDefines();
+    void createDeploy(QString frameNameLower);
 };
 
 #endif // MAINWINDOW_H

@@ -46,9 +46,10 @@ void MainWindow::createMotorsList(int value){
 void MainWindow::generateFrame(){
 
     QString frameName=txt_frame_name->toPlainText().toLower();
-    frameName.replace( " ", "" );
-    frameName[0] = frameName[0].toUpper(); //Formatting
+    frameName.replace( " ", "" ); //Formatting
+    frameName[0] = frameName[0].toUpper();
     QString frameNameUpper=frameName.toUpper();
+    QString frameNameLower=frameName.toLower();
 
     if(frameName!=NULL &&  frameName.compare("")!=1){
       qDebug()<<"FrameName " + frameName;
@@ -56,14 +57,20 @@ void MainWindow::generateFrame(){
         //editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameNameUpper + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName,true);
 
       //Modify Ardusub/config.h file
-        //editFile(ARDUSUB_CONFIG,"# define FRAME_CONFIG_STRING \"ROV_VECTORED90_FRAME\"","#elif FRAME_CONFIG == " + frameNameUpper + "_FRAME\n# define FRAME_CONFIG_STRING \"ROV_" + frameNameUpper+ "_FRAME\"",true);
+       //editFile(ARDUSUB_CONFIG,"# define FRAME_CONFIG_STRING \"ROV_VECTORED90_FRAME\"","#elif FRAME_CONFIG == " + frameNameUpper + "_FRAME\n# define FRAME_CONFIG_STRING \"ROV_" + frameNameUpper+ "_FRAME\"",true);
 
       //Modify Ardusub/defines.h file
-      int definesNumber=checkDefines();
+      /*int definesNumber=checkDefines();
       if(definesNumber==14)
         editFile(ARDUSUB_DEFINES,"#define VECTORED90_FRAME 14","#define "+ frameNameUpper + "_FRAME 15\n//ArdusubFrameGenerator#15",true);
       else
-        editFile(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber) , "#define "+ frameNameUpper + "_FRAME "+ QString("%1").arg(definesNumber+1) + "\n//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber+1)  ,false);
+        editFile(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber) , "#define "+ frameNameUpper + "_FRAME "+ QString("%1").arg(definesNumber+1) + "\n//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber+1)  ,false);*/
+
+        //Modify Ardusub/deploy.sh
+        createDeploy(frameNameLower);
+
+
+
 
     }
     else
@@ -74,7 +81,6 @@ int MainWindow::checkDefines(){
     QFile file(ARDUSUB_DEFINES);
     file.open(QIODevice::ReadOnly);
     QTextStream in(&file);
-
 
     while (!in.atEnd()){
         QString line=in.readLine();
@@ -87,25 +93,55 @@ int MainWindow::checkDefines(){
 
 }
 
+void MainWindow::createDeploy(QString frameNameLower){
+
+     QFile file(ARDUSUB_DEPLOY);
+     file.open(QIODevice::ReadOnly);
+     QTextStream in(&file);
+     QString dataText="";
+
+     while (!in.atEnd()){
+         QString line=in.readLine();
+          if(line.contains("TARGETS=(bluerov vectored vectored6dof simplerov"))
+            line= line.mid(0 , line.size()-1) + " " +frameNameLower + ")";
+
+          dataText=dataText+"\n"+line;
+
+     }
+     file.close();
+
+     QFile newFile(ARDUSUB_DEPLOY);
+
+     if(newFile.open(QFile::WriteOnly | QFile::Truncate)) {
+         QTextStream out(&newFile);
+         newFile.write(dataText.toUtf8());
+     }
+     newFile.close();
+
+}
+
 void MainWindow::editFile(QString filePath, QString tag, QString add, bool mantain){
     QFile file(filePath);
     file.open(QIODevice::ReadOnly);
+
     QRegularExpression re(tag);
     QString dataText = file.readAll();
     file.close();
-    QString *replacementText;
 
-    if(mantain)
-    replacementText=new QString(tag + "\n" + add);
-    else
-    replacementText=new QString(add);
 
-    dataText.replace(re, *replacementText);
+    QString replacementText(tag + "\n" + add);
+    if(!mantain)
+    replacementText=add;
+
+
+
+    dataText.replace(re, replacementText);
 
     QFile newFile(filePath);
+
     if(newFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&newFile);
-        out << dataText;
+        newFile.write(dataText.toUtf8());
     }
     newFile.close();
 }
