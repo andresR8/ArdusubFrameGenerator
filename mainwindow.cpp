@@ -18,7 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     motorsList=ui->motors_list;
     number_motors=ui->spin_motors;
-    createMotorsList();
+    connect(number_motors, SIGNAL(valueChanged(int)) , this, SLOT(createMotorsList(int)));
+    createMotorsList(number_motors->text().toInt());
 }
 
 MainWindow::~MainWindow()
@@ -26,12 +27,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::createMotorsList(){
+void MainWindow::createMotorsList(int value){
 
-
-    int motors=number_motors->text().toInt();
-
-    for(int i=0;i< motors;i++) {
+    for(int i=0;i< value;i++) {
 
         qDebug() << i ;
 

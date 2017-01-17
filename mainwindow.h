@@ -19,12 +19,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void createMotorsList(int value);
+
+
 private:
     Ui::MainWindow *ui;
     QListWidget *motorsList;
     QSpinBox *number_motors;
     //Private functions
-    void createMotorsList();
+
 };
 
 #endif // MAINWINDOW_H

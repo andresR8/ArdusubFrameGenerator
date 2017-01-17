@@ -35,38 +35,44 @@ MotorItem::MotorItem(QWidget *parent, int motorNum) :
        spMotorChannel->setMaximum(8);
        spMotorChannel->setMinimum(1);
        spMotorChannel->setValue(motorNum+1);
+       spMotorChannel->installEventFilter(this);
 
 
        spPitchFactor=new QDoubleSpinBox();
        spPitchFactor->setAlignment(Qt::AlignCenter);
        spPitchFactor->setMaximum(1);
        spPitchFactor->setMinimum(-1);
+       spPitchFactor->installEventFilter(this);
 
        spRollFactor=new QDoubleSpinBox();
        spRollFactor->setMaximum(1);
        spRollFactor->setMinimum(-1);
        spRollFactor->setAlignment(Qt::AlignCenter);
+       spRollFactor->installEventFilter(this);
 
        spYawFactor=new QDoubleSpinBox();
        spYawFactor->setMaximum(1);
        spYawFactor->setMinimum(-1);
        spYawFactor->setAlignment(Qt::AlignCenter);
+       spYawFactor->installEventFilter(this);
 
        spThrottleFactor= new QDoubleSpinBox();
        spThrottleFactor->setMaximum(1);
        spThrottleFactor->setMinimum(-1);
        spThrottleFactor->setAlignment(Qt::AlignCenter);
+       spThrottleFactor->installEventFilter(this);
 
        spFordwardFactor=new QDoubleSpinBox();
        spFordwardFactor->setMaximum(1);
        spFordwardFactor->setMinimum(-1);
        spFordwardFactor->setAlignment(Qt::AlignCenter);
+       spFordwardFactor->installEventFilter(this);
 
        spStrafeFactor=new QDoubleSpinBox();
        spStrafeFactor->setMaximum(1);
        spStrafeFactor->setMinimum(-1);
        spStrafeFactor->setAlignment(Qt::AlignCenter);
-
+       spStrafeFactor->installEventFilter(this);
 
        HLayout1->addWidget(lblMotorChannel);
        HLayout1->addWidget(lblPitchFactor);
@@ -96,4 +102,14 @@ MotorItem::MotorItem(QWidget *parent, int motorNum) :
 
        this->setLayout(MainLayout);
 
+}
+
+bool MotorItem::eventFilter( QObject * o, QEvent * e ) {
+   if ( e->type() == QEvent::Wheel &&
+        qobject_cast<QAbstractSpinBox*>( o ) )
+   {
+       e->ignore();
+       return true;
+   }
+   return QWidget::eventFilter( o, e );
 }

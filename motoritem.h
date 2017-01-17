@@ -7,6 +7,8 @@
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QLine>
+#include <QEvent>
+#include <QDebug>
 
 #define LW_STYLE1 "background-color: rgb(192,192,192) ;"
 #define LW_STYLE2 "border-color: black;"
@@ -17,9 +19,9 @@ class MotorItem : public QWidget
 public:
     explicit MotorItem(QWidget *parent = 0, int motorNum=0);
 
-signals:
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 
-public slots:
 
 private:
     QVBoxLayout *MainLayout;
