@@ -18,7 +18,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     motorsList=ui->motors_list;
     number_motors=ui->spin_motors;
+    btn_generate=ui->btnGenerate;
+    txt_frame_name=ui->txtFrameName;
     connect(number_motors, SIGNAL(valueChanged(int)) , this, SLOT(createMotorsList(int)));
+    connect(btn_generate, SIGNAL(clicked()) , this, SLOT(generateFrame()));
+
     createMotorsList(number_motors->text().toInt());
 }
 
@@ -28,11 +32,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::createMotorsList(int value){
-
     for(int i=0;i< value;i++) {
-
-        qDebug() << i ;
-
         QListWidgetItem *item = new QListWidgetItem();
         item->setSizeHint(QSize(item->sizeHint().width(), 100));
         MotorItem *motorItem = new MotorItem(this,i);
@@ -41,4 +41,36 @@ void MainWindow::createMotorsList(int value){
         motorsList->addItem(item);
         motorsList->setItemWidget(item, motorItem);
      }
+}
+
+void MainWindow::generateFrame(){
+
+    QString frameName=txt_frame_name->toPlainText().toLower();
+    frameName.replace( " ", "" );
+    frameName[0] = frameName[0].toUpper(); //Formatting
+
+    if(frameName!=NULL){
+      qDebug()<<"FrameName " + frameName;
+    //Modify Ardusub/sub.h file
+    editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameName.toUpper() + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName);
+    }
+    else
+        qDebug()<<"Frame Name null";
+}
+
+void MainWindow::editFile(QString filePath, QString tag, QString add){
+    QFile file(filePath);
+    file.open(QIODevice::ReadOnly);
+    QRegularExpression re(tag);
+    QString dataText = file.readAll();
+    file.close();
+    QString replacementText(tag + "\n" + add);
+    dataText.replace(re, replacementText);
+
+    QFile newFile(filePath);
+    if(newFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&newFile);
+        out << dataText;
+    }
+    newFile.close();
 }

@@ -81,7 +81,7 @@ color: rgb(148, 148, 148);</string>
       <string>ROV Frame name</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit">
+    <widget class="QTextEdit" name="txtFrameName">
      <property name="geometry">
       <rect>
        <x>160</x>
@@ -126,7 +126,7 @@ color: rgb(148, 148, 148);</string>
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="btnGenerate">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -167,7 +167,7 @@ color: rgb(255, 255, 255);
    </widget>
    <zorder>label_background</zorder>
    <zorder>frame</zorder>
-   <zorder>pushButton</zorder>
+   <zorder>btnGenerate</zorder>
    <zorder>motors_list</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
