@@ -51,6 +51,8 @@ void MainWindow::generateFrame(){
     QString frameNameUpper=frameName.toUpper();
     QString frameNameLower=frameName.toLower();
 
+    qDebug()<<QString("%1").arg(frameName.compare(""));
+
     if(frameName!=NULL &&  frameName.compare("")!=1){
       qDebug()<<"FrameName " + frameName;
       //Modify Ardusub/sub.h file
@@ -98,15 +100,14 @@ void MainWindow::createDeploy(QString frameNameLower){
      QFile file(ARDUSUB_DEPLOY);
      file.open(QIODevice::ReadOnly);
      QTextStream in(&file);
-     QString dataText="";
+     QString dataText;
 
      while (!in.atEnd()){
          QString line=in.readLine();
           if(line.contains("TARGETS=(bluerov vectored vectored6dof simplerov"))
             line= line.mid(0 , line.size()-1) + " " +frameNameLower + ")";
 
-          dataText=dataText+"\n"+line;
-
+          dataText=dataText+line+"\n";
      }
      file.close();
 
