@@ -48,11 +48,16 @@ void MainWindow::generateFrame(){
     QString frameName=txt_frame_name->toPlainText().toLower();
     frameName.replace( " ", "" );
     frameName[0] = frameName[0].toUpper(); //Formatting
+    QString frameNameUpper=frameName.toUpper();
 
-    if(frameName!=NULL){
+    if(frameName!=NULL && !frameName.compare("")){
       qDebug()<<"FrameName " + frameName;
-    //Modify Ardusub/sub.h file
-    editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameName.toUpper() + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName);
+      //Modify Ardusub/sub.h file
+      // editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameNameUpper + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName);
+
+      //Modify Ardusub/config.h file
+        editFile(ARDUSUB_CONFIG,"# define FRAME_CONFIG_STRING \"ROV_VECTORED90_FRAME\"","#elif FRAME_CONFIG == " + frameNameUpper + "_FRAME\n# define FRAME_CONFIG_STRING \"ROV_" + frameNameUpper+ "_FRAME\"");
+
     }
     else
         qDebug()<<"Frame Name null";
