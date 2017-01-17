@@ -49,28 +49,58 @@ void MainWindow::generateFrame(){
     frameName.replace( " ", "" );
     frameName[0] = frameName[0].toUpper(); //Formatting
     QString frameNameUpper=frameName.toUpper();
-    qDebug()<<QString("%1").arg(frameName.compare(""));
+
     if(frameName!=NULL &&  frameName.compare("")!=1){
       qDebug()<<"FrameName " + frameName;
       //Modify Ardusub/sub.h file
-        //editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameNameUpper + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName);
+        //editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameNameUpper + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName,true);
 
       //Modify Ardusub/config.h file
-        //editFile(ARDUSUB_CONFIG,"# define FRAME_CONFIG_STRING \"ROV_VECTORED90_FRAME\"","#elif FRAME_CONFIG == " + frameNameUpper + "_FRAME\n# define FRAME_CONFIG_STRING \"ROV_" + frameNameUpper+ "_FRAME\"");
+        //editFile(ARDUSUB_CONFIG,"# define FRAME_CONFIG_STRING \"ROV_VECTORED90_FRAME\"","#elif FRAME_CONFIG == " + frameNameUpper + "_FRAME\n# define FRAME_CONFIG_STRING \"ROV_" + frameNameUpper+ "_FRAME\"",true);
+
+      //Modify Ardusub/defines.h file
+      int definesNumber=checkDefines();
+      if(definesNumber==14)
+        editFile(ARDUSUB_DEFINES,"#define VECTORED90_FRAME 14","#define "+ frameNameUpper + "_FRAME 15\n//ArdusubFrameGenerator#15",true);
+      else
+        editFile(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber) , "#define "+ frameNameUpper + "_FRAME "+ QString("%1").arg(definesNumber+1) + "\n//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber+1)  ,false);
 
     }
     else
         qDebug()<<"Frame Name null";
 }
 
-void MainWindow::editFile(QString filePath, QString tag, QString add){
+int MainWindow::checkDefines(){
+    QFile file(ARDUSUB_DEFINES);
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+
+
+    while (!in.atEnd()){
+        QString line=in.readLine();
+         if(line.contains("//ArdusubFrameGenerator#"))
+                 return line.mid(line.indexOf("#")+1,line.size()-1).toInt();
+    }
+    file.close();
+
+    return 14;
+
+}
+
+void MainWindow::editFile(QString filePath, QString tag, QString add, bool mantain){
     QFile file(filePath);
     file.open(QIODevice::ReadOnly);
     QRegularExpression re(tag);
     QString dataText = file.readAll();
     file.close();
-    QString replacementText(tag + "\n" + add);
-    dataText.replace(re, replacementText);
+    QString *replacementText;
+
+    if(mantain)
+    replacementText=new QString(tag + "\n" + add);
+    else
+    replacementText=new QString(add);
+
+    dataText.replace(re, *replacementText);
 
     QFile newFile(filePath);
     if(newFile.open(QFile::WriteOnly | QFile::Truncate)) {

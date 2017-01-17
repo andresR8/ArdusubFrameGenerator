@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 
+
 #define ARDUSUB_SUB     "ArduSub/Sub.h"
 #define ARDUSUB_CONFIG  "ArduSub/config.h"
 #define ARDUSUB_DEFINES "ArduSub/defines.h"
@@ -47,7 +48,8 @@ private:
     QPushButton *btn_generate;
     QTextEdit *txt_frame_name;
     //Private functions
-    void editFile(QString filePath, QString tag, QString add);
+    void editFile(QString filePath, QString tag, QString add, bool mantain);
+    int checkDefines();
 };
 
 #endif // MAINWINDOW_H
