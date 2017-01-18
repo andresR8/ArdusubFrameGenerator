@@ -1,5 +1,6 @@
 # ArdusubFrameGenerator
 A simple desktop app to add custom frames in the ArduSub project
+<p align="center"><img src="https://media.giphy.com/media/26xBIWfAXBrvZJz6U/source.gif"></p>
 
 ##USAGE
 
