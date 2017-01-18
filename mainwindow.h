@@ -11,6 +11,7 @@
 #include <QString>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QMessageBox>
 
 
 #define ARDUSUB_SUB     "ArduSub/Sub.h"
@@ -19,7 +20,8 @@
 #define ARDUSUB_DEPLOY  "ArduSub/deploy.sh"
 #define AP_MOTORS       "libraries/AP_Motors/AP_Motors.h"
 #define MK_TARGETS      "mk/targets.mk"
-#define LIBRARIES       "libraries/"
+#define AP_MF_H         "libraries/AP_Motors/AP_MotorsSimpleROV.h"
+#define AP_MF_CPP       "libraries/AP_Motors/AP_MotorsSimpleROV.cpp"
 
 
 
@@ -39,19 +41,22 @@ public:
 private slots:
     void createMotorsList(int value);
     void generateFrame();
+    void aboutMsg();
 
 
 private:
     Ui::MainWindow *ui;
     QListWidget *motorsList;
     QSpinBox *number_motors;
-    QPushButton *btn_generate;
+    QPushButton *btn_generate, *btn_about;
     QTextEdit *txt_frame_name;
+    QMessageBox *msg_done, *msg_error;
     //Private functions
     void editFile(QString filePath, QString tag, QString add, bool overwrite);
     int checkDefines();
-    void createDeploy(QString frameNameLower);
     QString getLineContains(QString file, QString contains);
+    void cleanCPPfile(QString cppFile);
+    bool checkFiles();
 };
 
 #endif // MAINWINDOW_H

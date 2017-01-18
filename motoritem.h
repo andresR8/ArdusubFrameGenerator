@@ -30,6 +30,10 @@ private:
     QDoubleSpinBox  *spRollFactor, *spPitchFactor,  *spYawFactor,  *spThrottleFactor,  *spFordwardFactor,  *spStrafeFactor;
     QSpinBox *spMotorChannel;
     QWidget *spacer;
+
+public:
+    QString getMotorDefinition();
+    QString getMotorAdd();
 };
 
 #endif // MOTORITEM_H

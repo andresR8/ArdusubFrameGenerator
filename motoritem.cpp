@@ -113,3 +113,23 @@ bool MotorItem::eventFilter( QObject * o, QEvent * e ) {
    }
    return QWidget::eventFilter( o, e );
 }
+
+QString MotorItem::getMotorAdd(){
+    return 	"add_motor_raw_6dof(AP_MOTORS_MOT_"+spMotorChannel->text()+
+            ", MOT_"+spMotorChannel->text()+"_ROLL_FACTOR, MOT_"+spMotorChannel->text()+"_PITCH_FACTOR, MOT_"+spMotorChannel->text()+
+            "_YAW_FACTOR, MOT_" + spMotorChannel->text()+"_THROTTLE_FACTOR, MOT_"+spMotorChannel->text()+"_FORWARD_FACTOR, MOT_"+
+            spMotorChannel->text()+"_STRAFE_FACTOR,"+spMotorChannel->text()+");";
+}
+
+QString MotorItem::getMotorDefinition(){
+    QString motorDef="		//ArduSub Frame Generator Motor Channel #"+ spMotorChannel->text() +"\n		";
+     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_ROLL_FACTOR = " +spRollFactor->text() + ",\n		";
+     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_PITCH_FACTOR = " +spPitchFactor->text() + ",\n		";
+     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_YAW_FACTOR = " +spYawFactor->text() + ",\n		";
+     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_THROTTLE_FACTOR = " +spThrottleFactor->text() + ",\n		";
+     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_FORWARD_FACTOR = " +spFordwardFactor->text() + ",\n		";
+     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_STRAFE_FACTOR = " +spStrafeFactor->text() + ",\n";
+
+     return motorDef;
+}
+
