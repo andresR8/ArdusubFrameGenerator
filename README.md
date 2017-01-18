@@ -3,7 +3,7 @@ A simple desktop app to add custom frames in the ArduSub project
 
 ##USAGE
 
-1. Copy the ardusubFrameGenerator to the ardusub folder.
+1. Copy the ardusubFrameGenerator to the ardusub folder. (It's in prebuilds folder)
 2. Give it permissions for execution sudo chmod u+x ardusubFrameGenerator
 3. Run.
 4. Fill the custom frame name that you want (Avoid to use bash reserved words, it may cause problems with Ardusub/deploy.sh file).
