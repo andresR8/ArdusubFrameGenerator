@@ -43,6 +43,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::createMotorsList(int value){
+    motorsList->clear();
     for(int i=0;i< value;i++) {
         QListWidgetItem *item = new QListWidgetItem();
         item->setSizeHint(QSize(item->sizeHint().width(), 100));
