@@ -13,15 +13,7 @@
 #include <QTextEdit>
 #include <QMessageBox>
 
-
-#define ARDUSUB_SUB     "ArduSub/Sub.h"
-#define ARDUSUB_CONFIG  "ArduSub/config.h"
-#define ARDUSUB_DEFINES "ArduSub/defines.h"
-#define ARDUSUB_DEPLOY  "ArduSub/deploy.sh"
-#define AP_MOTORS       "libraries/AP_Motors/AP_Motors.h"
-#define MK_TARGETS      "mk/targets.mk"
-#define AP_MF_H         "libraries/AP_Motors/AP_MotorsSimpleROV.h"
-#define AP_MF_CPP       "libraries/AP_Motors/AP_MotorsSimpleROV.cpp"
+#define AP_FRAME_TARGET      "libraries/AP_Motors/AP_Motors6DOF.cpp"
 
 
 
@@ -53,10 +45,10 @@ private:
     QMessageBox *msg_done, *msg_error;
     //Private functions
     void editFile(QString filePath, QString tag, QString add, bool overwrite);
-    int checkDefines();
-    QString getLineContains(QString file, QString contains);
+    bool getLineContains(QString filePath, QString contains);
     void cleanCPPfile(QString cppFile);
-    bool checkFiles();
+
+
 };
 
 #endif // MAINWINDOW_H

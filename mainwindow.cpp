@@ -19,8 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     motorsList=ui->motors_list;
     number_motors=ui->spin_motors;
     btn_generate=ui->btnGenerate;
-    btn_about=ui->btnAbout;
-    txt_frame_name=ui->txtFrameName;
+    btn_about=ui->btnAbout;    
     connect(number_motors, SIGNAL(valueChanged(int)) , this, SLOT(createMotorsList(int)));
     connect(btn_generate, SIGNAL(clicked()) , this, SLOT(generateFrame()));
     connect(btn_about, SIGNAL(clicked()) , this, SLOT(aboutMsg()));
@@ -56,116 +55,45 @@ void MainWindow::createMotorsList(int value){
 }
 
 void MainWindow::generateFrame(){
-    if(!checkFiles()){
+    QFile f(AP_FRAME_TARGET);
+    if(!f.exists()){
         msg_error->setText("An ardusub neccesary file is missing.\nPlease check that AFG is located in the ardusub path");
         msg_error->show();
         return;
     }
 
-
-    QString frameName=txt_frame_name->toPlainText().trimmed().toLower();
-    frameName.replace( " ", "" ); //Formatting
-    frameName[0] = frameName[0].toUpper();
-    QString frameNameUpper=frameName.toUpper();
-    QString frameNameLower=frameName.toLower();
-
-
-    if(frameName!=NULL &&  frameName[0].unicode()!=0){
-      qDebug()<<"FrameName " + frameName;
-      //Modify Ardusub/sub.h file
-      editFile(ARDUSUB_SUB," #define MOTOR_CLASS AP_MotorsVectored90","#elif FRAME_CONFIG ==" + frameNameUpper + "_FRAME\n #define MOTOR_CLASS AP_Motors" + frameName,false);
-
-      //Modify Ardusub/config.h file
-      editFile(ARDUSUB_CONFIG,"# define FRAME_CONFIG_STRING \"ROV_VECTORED90_FRAME\"","#elif FRAME_CONFIG == " + frameNameUpper + "_FRAME\n# define FRAME_CONFIG_STRING \"ROV_" + frameNameUpper+ "_FRAME\"",false);
-
-      //Modify Ardusub/defines.h file
-      int definesNumber=checkDefines();
-      if(definesNumber==14)
-        editFile(ARDUSUB_DEFINES,"#define VECTORED90_FRAME 14","#define "+ frameNameUpper + "_FRAME 15\n//ArdusubFrameGenerator#15",false);
-      else
-        editFile(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber) , "#define "+ frameNameUpper + "_FRAME "+ QString("%1").arg(definesNumber+1) + "\n//ArdusubFrameGenerator#" + QString("%1").arg(definesNumber+1)  ,true);
-
-       //Modify Ardusub/deploy.sh
-       QString targetLine=getLineContains(ARDUSUB_DEPLOY,"TARGETS=(bluerov vectored vectored6dof simplerov");
-       QString targetLineFixed=targetLine.mid(0,targetLine.indexOf("("))+"\\"+targetLine.mid(targetLine.indexOf("("),targetLine.indexOf(")")-targetLine.indexOf("("))+"\\)";
-       QString ntargetLine=targetLine.mid(0,targetLine.indexOf(")")) + " " + frameNameLower + ")";
-       editFile(ARDUSUB_DEPLOY,targetLineFixed,ntargetLine,true);
-
-      //Modify libraries/AP_Motors/AP_Motors.h
-       editFile(AP_MOTORS,"#include \"AP_MotorsSimpleROV.h\"" ,"#include \"AP_Motors" + frameName +"ROV.h",false);
-
-       //Modify mk/targets.mk
-       QString newTargets=getLineContains(MK_TARGETS,"FRAMES = quad tri hexa y6 octa octa-quad heli single coax");
-       editFile(MK_TARGETS,newTargets,newTargets + " " +frameNameLower,true);
-
-      //Creating file /libraries/AP_Motors/AP_MotorXXXXROV.h
-       QFile file_H(AP_MF_H);
-       QString newFrameH="libraries/AP_Motors/AP_Motors"+frameName+"ROV.h";
-       file_H.copy(newFrameH);
-       editFile(newFrameH, "/// @file	AP_MotorsSimpleROV.h" , "/// @file	AP_Motors"+ frameName +"ROV.h", true);
-       editFile(newFrameH,"/// @brief	Motor control class for SimpleROV" ,"/// @brief	Motor control class for " + frameName + "ROV generated with ArdusubFrameGenerator",true);
-       editFile(newFrameH, "#ifndef __AP_MOTORS_SIMPLEROV_H__\n#define __AP_MOTORS_SIMPLEROV_H__" , "#ifndef __AP_MOTORS_" + frameNameUpper + "ROV_H__\n#define __AP_MOTORS_" + frameNameUpper + "ROV_H__" ,true);
-       editFile(newFrameH, "class AP_MotorsSimpleROV : public AP_Motors6DOF {","class AP_Motors" + frameName + "ROV : public AP_Motors6DOF {",true);
-       editFile(newFrameH, "/// @class      AP_MotorsSimpleROV", "/// @class      AP_Motors"+frameName+"ROV",true);
-       editFile(newFrameH, "    AP_MotorsSimpleROV\\(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT\\) :", "    AP_Motors" + frameName +"ROV(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT) :",true);
-       editFile(newFrameH, "#endif  // AP_MotorsSimpleROV", "#endif  // AP_Motors"+frameName+"ROV",true);
-
-
-       // Creating file libraries/AP_MotorsXXXXROV.cpp
-      QString newFrameCPP="libraries/AP_Motors/AP_Motors"+frameName+"ROV.cpp";
-      cleanCPPfile(newFrameCPP);
-      editFile(newFrameCPP," \\*       AP_MotorsSimple ROV.cpp"," *       AP_Motors"+frameName+" ROV.cpp File created with ArdusubFrameGenerator",true);
-      editFile(newFrameCPP,"#include \"AP_MotorsSimpleROV.h\"","#include \"AP_Motors"+frameName+"ROV.h\"",true);
-      editFile(newFrameCPP,"// setup_motors - configures the motors for the BlueROV","// setup_motors - configures the motors for the "+ frameName+ " ROV",true);
-      editFile(newFrameCPP,"void AP_MotorsSimpleROV::setup_motors\\(\\)","void AP_Motors"+frameName+"ROV::setup_motors()",true);
-      editFile(newFrameCPP,"	// hard coded config for Simple ROV","	// hard coded config for "+frameName+" ROV",true);
-
+       // Modifiying file libraries/AP_Motors6DOF.cpp
       QString motorDefs=NULL;
 
       for  (int i=0; i < motorsList->count();i++) {
-
           QListWidgetItem* item = motorsList->item(i);
           MotorItem* m=(MotorItem*)motorsList->itemWidget(item)  ;
-          motorDefs.append(m->getMotorDefinition());
-          motorDefs.append("\n");
+          motorDefs.append(m->getMotorAdd());         
+
+          if(i!=motorsList->count()-1)
+              motorDefs.append("\n");
       }
 
-      motorDefs[motorDefs.size()-3]=';';
 
-      for  (int i=0; i < motorsList->count();i++) {
-          QListWidgetItem* item = motorsList->item(i);
-          MotorItem* m=(MotorItem*)motorsList->itemWidget(item)  ;
-          motorDefs.append(m->getMotorAdd());
-          motorDefs.append("\n");
-      }
+      if(getLineContains(AP_FRAME_TARGET,"	    	break;// ArdusubFrameGenerator"))
+          cleanCPPfile(AP_FRAME_TARGET);
+      else
+            motorDefs.append("\n	    	break;// ArdusubFrameGenerator");
 
-      editFile(newFrameCPP,"		// Right forward thruster",motorDefs,true);
+      editFile(AP_FRAME_TARGET,"	    case AS_MOTORS_CUSTOM_FRAME:",motorDefs,false);
 
 
       //Done
-        msg_done->setText("The new frame has been created:\n\nTo compile please use:\n      make px4-v2-"+ frameNameLower + "\n\nTo compile and upload use:\n     make px4-v2-"+ frameNameLower + "-upload");
-        msg_done->show();
+      msg_done->setText("The new frame has been created:\n\nTo compile please use:\n      make px4-v2\n\nTo compile and upload use:\n     make px4-v2-upload");
+      msg_done->show();
 
-    }
-    else{
-        msg_error->setText("Please fill the frame name field");
-        msg_error->show();
-    }
-}
 
-int MainWindow::checkDefines(){
-
-    QString line=getLineContains(ARDUSUB_DEFINES,"//ArdusubFrameGenerator#");
-
-    if(line!=NULL)
-            return line.mid(line.indexOf("#")+1,line.size()-1).toInt();
-
-    return 14;
 
 }
+
 
 void MainWindow::cleanCPPfile(QString cppFile){
-    QFile file(AP_MF_CPP);
+    QFile file(cppFile);
     file.open(QIODevice::ReadOnly);
     QTextStream in(&file);
     QString dataOut=NULL;
@@ -174,13 +102,13 @@ void MainWindow::cleanCPPfile(QString cppFile){
 
     while (!in.atEnd()){
         QString line=in.readLine();
-
          if(!initClean){
-            initClean=line.contains("		MOT_1_ROLL_FACTOR = 0,");
+            initClean=line.contains("	    case AS_MOTORS_CUSTOM_FRAME:");
          }
          else if(!stopClean){
-            stopClean=line.contains("	add_motor_raw_6dof(AP_MOTORS_MOT_5, MOT_5_ROLL_FACTOR, MOT_5_PITCH_FACTOR, MOT_5_YAW_FACTOR, MOT_5_THROTTLE_FACTOR, MOT_5_FORWARD_FACTOR, MOT_5_STRAFE_FACTOR,5);");
-            line=in.readLine();
+            stopClean=line.contains("	    	break;// ArdusubFrameGenerator");
+            if(stopClean)
+                dataOut=dataOut+"	    case AS_MOTORS_CUSTOM_FRAME:\n";
          }
 
 
@@ -199,7 +127,7 @@ void MainWindow::cleanCPPfile(QString cppFile){
 }
 
 
-QString MainWindow::getLineContains(QString filePath, QString contains){
+bool MainWindow::getLineContains(QString filePath, QString contains){
     QFile file(filePath);
     file.open(QIODevice::ReadOnly);
     QTextStream in(&file);
@@ -208,13 +136,12 @@ QString MainWindow::getLineContains(QString filePath, QString contains){
     while (!in.atEnd()){
         QString line=in.readLine();
          if(line.contains(contains)){
-           dataOut=line;
-           break;
+           return true;
          }
     }
     file.close();
 
-    return dataOut;
+    return false;
 }
 
 void MainWindow::editFile(QString filePath, QString tag, QString add, bool overwrite){
@@ -240,34 +167,6 @@ void MainWindow::editFile(QString filePath, QString tag, QString add, bool overw
     newFile.close();
 }
 
-
-bool MainWindow::checkFiles(){
-    QFile f(ARDUSUB_CONFIG);
-    if(!f.exists()) return false;
-
-    QFile f1(ARDUSUB_DEFINES);
-    if(!f1.exists()) return false;
-
-    QFile f2(ARDUSUB_DEPLOY);
-    if(!f2.exists()) return false;
-
-    QFile f3(ARDUSUB_SUB);
-    if(!f3.exists()) return false;
-
-   QFile f4(AP_MOTORS);
-    if(!f4.exists()) return false;
-
-    QFile f5(MK_TARGETS);
-    if(!f5.exists()) return false;
-
-    QFile f6(AP_MF_H);
-    if(!f6.exists()) return false;
-
-    QFile f7(AP_MF_CPP);
-    if(!f7.exists()) return false;
-
-    return true;
-}
 
 void MainWindow::aboutMsg(){
     QMessageBox *about=new QMessageBox();

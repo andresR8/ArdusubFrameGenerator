@@ -26,13 +26,12 @@ protected:
 private:
     QVBoxLayout *MainLayout;
     QHBoxLayout *HLayout1, *HLayout2;
-    QLabel *lblMotorChannel,*lblRollFactor,*lblPitchFactor, *lblYawFactor, *lblThrottleFactor, *lblFordwardFactor, *lblStrafeFactor;
-    QDoubleSpinBox  *spRollFactor, *spPitchFactor,  *spYawFactor,  *spThrottleFactor,  *spFordwardFactor,  *spStrafeFactor;
+    QLabel *lblMotorChannel,*lblRollFactor,*lblPitchFactor, *lblYawFactor, *lblThrottleFactor, *lblFordwardFactor, *lblLateralFactor;
+    QDoubleSpinBox  *spRollFactor, *spPitchFactor,  *spYawFactor,  *spThrottleFactor,  *spFordwardFactor,  *spLateralFactor;
     QSpinBox *spMotorChannel;
     QWidget *spacer;
 
 public:
-    QString getMotorDefinition();
     QString getMotorAdd();
 };
 

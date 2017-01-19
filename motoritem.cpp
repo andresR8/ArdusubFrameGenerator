@@ -24,10 +24,10 @@ MotorItem::MotorItem(QWidget *parent, int motorNum) :
       lblYawFactor->setAlignment(Qt::AlignCenter);
       lblThrottleFactor= new QLabel("Thottle\nFactor");
       lblThrottleFactor->setAlignment(Qt::AlignCenter);
-      lblFordwardFactor=new QLabel("Fordward\nFactor");
+      lblFordwardFactor=new QLabel("Forward\nFactor");
       lblFordwardFactor->setAlignment(Qt::AlignCenter);
-      lblStrafeFactor=new QLabel("Strafe\nFactor");
-      lblStrafeFactor->setAlignment(Qt::AlignCenter);
+      lblLateralFactor=new QLabel("Lateral\nFactor");
+      lblLateralFactor->setAlignment(Qt::AlignCenter);
 
 
        spMotorChannel=new QSpinBox();
@@ -68,27 +68,27 @@ MotorItem::MotorItem(QWidget *parent, int motorNum) :
        spFordwardFactor->setAlignment(Qt::AlignCenter);
        spFordwardFactor->installEventFilter(this);
 
-       spStrafeFactor=new QDoubleSpinBox();
-       spStrafeFactor->setMaximum(1);
-       spStrafeFactor->setMinimum(-1);
-       spStrafeFactor->setAlignment(Qt::AlignCenter);
-       spStrafeFactor->installEventFilter(this);
+       spLateralFactor=new QDoubleSpinBox();
+       spLateralFactor->setMaximum(1);
+       spLateralFactor->setMinimum(-1);
+       spLateralFactor->setAlignment(Qt::AlignCenter);
+       spLateralFactor->installEventFilter(this);
 
        HLayout1->addWidget(lblMotorChannel);
-       HLayout1->addWidget(lblPitchFactor);
        HLayout1->addWidget(lblRollFactor);
+       HLayout1->addWidget(lblPitchFactor);       
        HLayout1->addWidget(lblYawFactor);
        HLayout1->addWidget(lblThrottleFactor);
        HLayout1->addWidget(lblFordwardFactor);
-       HLayout1->addWidget(lblStrafeFactor);
+       HLayout1->addWidget(lblLateralFactor);
 
-       HLayout2->addWidget(spMotorChannel);
-       HLayout2->addWidget(spPitchFactor);
+       HLayout2->addWidget(spMotorChannel);       
        HLayout2->addWidget(spRollFactor);
+       HLayout2->addWidget(spPitchFactor);
        HLayout2->addWidget(spYawFactor);
        HLayout2->addWidget(spThrottleFactor);
        HLayout2->addWidget(spFordwardFactor);
-       HLayout2->addWidget(spStrafeFactor);
+       HLayout2->addWidget(spLateralFactor);
 
 
 
@@ -115,21 +115,17 @@ bool MotorItem::eventFilter( QObject * o, QEvent * e ) {
 }
 
 QString MotorItem::getMotorAdd(){
-    return 	"add_motor_raw_6dof(AP_MOTORS_MOT_"+spMotorChannel->text()+
-            ", MOT_"+spMotorChannel->text()+"_ROLL_FACTOR, MOT_"+spMotorChannel->text()+"_PITCH_FACTOR, MOT_"+spMotorChannel->text()+
-            "_YAW_FACTOR, MOT_" + spMotorChannel->text()+"_THROTTLE_FACTOR, MOT_"+spMotorChannel->text()+"_FORWARD_FACTOR, MOT_"+
-            spMotorChannel->text()+"_STRAFE_FACTOR,"+spMotorChannel->text()+");";
+    return 	"	    	add_motor_raw_6dof(AP_MOTORS_MOT_"+spMotorChannel->text()+
+            ",		 "+spRollFactor->text()+"f"+
+            ",		 "+spPitchFactor->text()+"f"+
+            ",		 "+spYawFactor->text()+"f"+
+            ",		 "+spThrottleFactor->text()+"f"+
+            ",		 "+spFordwardFactor->text()+"f"+
+            ",		 "+spLateralFactor->text()+
+            "		 "+spMotorChannel->text()+");";
+
+
+
 }
 
-QString MotorItem::getMotorDefinition(){
-    QString motorDef="		//ArduSub Frame Generator Motor Channel #"+ spMotorChannel->text() +"\n		";
-     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_ROLL_FACTOR = " +spRollFactor->text() + ",\n		";
-     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_PITCH_FACTOR = " +spPitchFactor->text() + ",\n		";
-     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_YAW_FACTOR = " +spYawFactor->text() + ",\n		";
-     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_THROTTLE_FACTOR = " +spThrottleFactor->text() + ",\n		";
-     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_FORWARD_FACTOR = " +spFordwardFactor->text() + ",\n		";
-     motorDef=motorDef+"MOT_"+spMotorChannel->text()+"_STRAFE_FACTOR = " +spStrafeFactor->text() + ",\n";
-
-     return motorDef;
-}
 
