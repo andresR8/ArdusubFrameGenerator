@@ -121,8 +121,8 @@ QString MotorItem::getMotorAdd(){
             ",		 "+spYawFactor->text()+"f"+
             ",		 "+spThrottleFactor->text()+"f"+
             ",		 "+spFordwardFactor->text()+"f"+
-            ",		 "+spLateralFactor->text()+
-            "		 "+spMotorChannel->text()+");";
+            ",		 "+spLateralFactor->text()+"f"+
+            ",		 "+spMotorChannel->text()+");";
 
 
 

@@ -81,7 +81,9 @@ void MainWindow::generateFrame(){
       else
             motorDefs.append("\n	    	break;// ArdusubFrameGenerator");
 
-      editFile(AP_FRAME_TARGET,"	    case AS_MOTORS_CUSTOM_FRAME:",motorDefs,false);
+      //qDebug()<<motorDefs;
+
+      editFile(AP_FRAME_TARGET,AP_CASE_LINE,motorDefs,false);
 
 
       //Done
@@ -104,12 +106,12 @@ void MainWindow::cleanCPPfile(QString cppFile){
     while (!in.atEnd()){
         QString line=in.readLine();
          if(!initClean){
-            initClean=line.contains("	    case AS_MOTORS_CUSTOM_FRAME:");
+            initClean=line.contains(AP_CASE_LINE);
          }
          else if(!stopClean){
             stopClean=line.contains("	    	break;// ArdusubFrameGenerator");
             if(stopClean)
-                dataOut=dataOut+"	    case AS_MOTORS_CUSTOM_FRAME:\n";
+                dataOut=dataOut+AP_CASE_LINE+"\n";
          }
 
 

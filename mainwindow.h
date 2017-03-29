@@ -14,6 +14,7 @@
 #include <QMessageBox>
 
 #define AP_FRAME_TARGET      "libraries/AP_Motors/AP_Motors6DOF.cpp"
+#define AP_CASE_LINE         "    case SUB_FRAME_CUSTOM:"
 
 
 
