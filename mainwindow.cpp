@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     );
     ui->setupUi(this);
     motorsList=ui->motors_list;
+    motorsList->setDragEnabled(false);
     number_motors=ui->spin_motors;
     btn_generate=ui->btnGenerate;
     btn_about=ui->btnAbout;    
